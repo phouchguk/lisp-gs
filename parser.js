@@ -1,4 +1,4 @@
-/* globals cons, Symbol */
+/* globals cons, makeSymbol */
 
 (function (exports) {
     "use strict";
@@ -163,6 +163,6 @@
             return null;
         }
 
-        return new Symbol(token);
+        return makeSymbol(token);
     };
 }(window.parser = window.parser || {}));
