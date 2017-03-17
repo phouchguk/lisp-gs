@@ -1,0 +1,53 @@
+body {
+    background-color: black;
+}
+
+div#repl, div#repl textarea {
+    color: white;
+    font-family: lucida console, courier new;
+    font-size: 9pt;
+    line-height: 14pt;
+}
+
+div#repl span#prompt {
+    float: left;
+}
+
+div#repl textarea {
+    background-color: black;
+    border: none;
+    float: left;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    resize: none;
+    width: 90%;
+}
+
+div#repl .lisp-bool {
+    color: orange;
+}
+
+div#repl .lisp-char {
+    color: lightGreen;
+}
+
+div#repl .lisp-nr {
+    color: lightBlue;
+}
+
+div#repl .lisp-paren {
+    color: grey;
+}
+
+div#repl .lisp-prim {
+    color: yellow;
+}
+
+div#repl .lisp-special {
+    color: purple;
+}
+
+div#repl .lisp-str {
+    color: red;
+}
