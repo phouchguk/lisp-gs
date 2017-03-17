@@ -3,7 +3,7 @@
 (function (exports) {
     "use strict";
 
-    var defSymbol, doSymbol, fnSymbol, ifSymbol, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, quoteSymbol, setSymbol;
+    var defSymbol, doSymbol, fnSymbol, ifSymbol, init, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, quoteSymbol, setSymbol;
 
     defSymbol = makeSymbol("def");
     doSymbol = makeSymbol("do");
@@ -12,6 +12,21 @@
     okSymbol = makeSymbol("ok");
     quoteSymbol = makeSymbol("quote");
     setSymbol = makeSymbol("set!");
+
+    init = function () {
+        exports.globalEnv.values["+"] = function (args) {
+            var result;
+
+            result = 0;
+
+            while (args !== null) {
+                result = result + car(args);
+                args = cdr(args);
+            }
+
+            return result;
+        };
+    };
 
     isSelfEvaluating = function (exp) {
         return exp === true || exp === null ||
@@ -52,17 +67,16 @@
                 return env.lookup(exp);
             }
 
-            arg1 = car(cdr(exp));
-
             // quote
             if (isTaggedList(exp, quoteSymbol)) {
-                return arg1;
+                return car(cdr(exp));
             }
-
-            arg2 = car(cdr(cdr(exp)));
 
             // set
             if (isTaggedList(exp, setSymbol)) {
+                arg1 = car(cdr(exp));
+                arg2 = car(cdr(cdr(exp)))
+;
                 env.set(arg1, exports.eval(arg2, env));
 
                 return okSymbol;
@@ -70,15 +84,20 @@
 
             // def
             if (isTaggedList(exp, defSymbol)) {
+                arg1 = car(cdr(exp));
+                arg2 = car(cdr(cdr(exp)));
+
                 env.def(arg1, exports.eval(arg2, env));
 
                 return okSymbol;
             }
 
-            arg3 = car(cdr(cdr(cdr(exp))));
-
             // if
             if (isTaggedList(exp, ifSymbol)) {
+                arg1 = car(cdr(exp));
+                arg2 = car(cdr(cdr(exp)));
+                arg3 = car(cdr(cdr(cdr(exp))));
+
                 if (exports.eval(arg1, env) === null) {
                     // false
                     exp = exports.eval(arg3, env);
@@ -92,6 +111,7 @@
 
             // fn
             if (isTaggedList(exp, fnSymbol)) {
+                arg1 = car(cdr(exp));
                 return new Fn(arg1, cdr(cdr(exp)), env);
             }
 
@@ -133,4 +153,5 @@
     };
 
     exports.globalEnv = new Env(null);
+    init();
 }(window.lisp = window.lisp || {}));

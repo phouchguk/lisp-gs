@@ -1,4 +1,4 @@
-/* globals car, cdr, Pair, Symbol */
+/* globals car, cdr, Fn, Pair, Symbol */
 
 (function (exports) {
     "use strict";
@@ -61,12 +61,16 @@
                 cls = "bool";
             } else if (obj instanceof Symbol) {
                 cls = "sym";
+            } else if (t === "function") {
+                cls = "paren";
             } else if (t === "number") {
                 cls = "nr";
             } else if (t === "string") {
                 cls = "str";
+            } else if (obj instanceof Fn) {
+                cls = "paren";
             } else {
-                throw("cannot write unknown type");
+                throw("cannot html unknown type");
             }
 
             return makeSpan(cls, text);
@@ -88,11 +92,19 @@
             return "(" + writePair(obj) + ")";
         }
 
+        if (obj instanceof Fn) {
+            return "#&lt;procedure&gt;";
+        }
+
         if (obj instanceof Symbol) {
             return obj.value;
         }
 
         t = typeof(obj);
+
+        if (t === "function") {
+            return "#&lt;procedure&gt;";
+        }
 
         if (t === "number") {
             return obj + "";
