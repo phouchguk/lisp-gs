@@ -9,27 +9,24 @@
     ta = document.getElementById("lisp-input");
 
     ta.addEventListener("keypress", function (e) {
-        //var result;
+        var result;
 
         if (e.keyCode === 13) {
             e.preventDefault();
 
             // if the user pressed enter, try and read
             try {
-                /*
-                result = lisp.html(lisp.eval(lisp.read(lisp.makeStream(ta.value)), lisp.theGlobalEnvironment));
+                result = parser.read(new stream.Stream(ta.value));
 
                 prompt.insertAdjacentHTML("beforebegin",
                                           "<span>&gt;&nbsp;" +
                                           ta.value +
                                           "</span><br>" +
-                                          result +
+                                          print.html(result) +
                                           "<br>");
-                */
 
-                console.log(print.write(parser.read(new stream.Stream(ta.value))));
+                //console.log(print.write(result));
 
-                // presume successful read
                 ta.value = "";
             } catch (err) {
                 console.error(err);

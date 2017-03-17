@@ -3,7 +3,30 @@
 (function (exports) {
     "use strict";
 
-    var writePair;
+    var htmlPair, makeSpan, writePair;
+
+    htmlPair = function (pair) {
+        var carObj, cdrObj, temp;
+
+        carObj = car(pair);
+        cdrObj = cdr(pair);
+
+        temp = exports.html(carObj);
+
+        if (cdrObj instanceof Pair) {
+            return temp + " " + htmlPair(cdrObj);
+        }
+
+        if (cdrObj === null) {
+            return temp;
+        }
+
+        return temp + " . " + exports.html(cdrObj);
+    };
+
+    makeSpan = function (cls, text) {
+        return "<span class=\"lisp-" + cls + "\">" + text + "</span>";
+    };
 
     writePair = function (pair) {
         var carObj, cdrObj, temp;
@@ -22,6 +45,32 @@
         }
 
         return temp + " . " + exports.write(cdrObj);
+    };
+
+
+    exports.html = function (obj) {
+        var cls, text, t;
+
+        if (obj instanceof Pair) {
+            return makeSpan("paren", "(") + htmlPair(obj) + makeSpan("paren", ")");
+        } else {
+            text = exports.write(obj);
+            t = typeof(obj);
+
+            if (obj === true || obj === null) {
+                cls = "bool";
+            } else if (obj instanceof Symbol) {
+                cls = "sym";
+            } else if (t === "number") {
+                cls = "nr";
+            } else if (t === "string") {
+                cls = "str";
+            } else {
+                throw("cannot write unknown type");
+            }
+
+            return makeSpan(cls, text);
+        }
     };
 
     exports.write = function (obj) {
