@@ -1,4 +1,4 @@
-/* globals console, lisp */
+/* globals console, parser, print, stream */
 
 (function () {
     "use strict";
@@ -27,7 +27,7 @@
                                           "<br>");
                 */
 
-                console.log(parser.read(new stream.Stream(ta.value)));
+                console.log(print.write(parser.read(new stream.Stream(ta.value))));
 
                 // presume successful read
                 ta.value = "";

@@ -159,6 +159,10 @@
 
         s.back();
 
+        if (token === "nil") {
+            return null;
+        }
+
         return new Symbol(token);
     };
 }(window.parser = window.parser || {}));
