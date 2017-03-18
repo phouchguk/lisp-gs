@@ -63,6 +63,10 @@
         exports.globalEnv.values["string->stream"] = function (args) {
             return new stream.Stream(car(args));
         };
+
+        exports.globalEnv.values.error = function (args) {
+            throw(car(args));
+        };
     };
 
     isSelfEvaluating = function (exp) {
