@@ -15,7 +15,7 @@
             e.preventDefault();
 
             // if the user pressed enter, try and read
-            try {
+//            try {
                 result = lisp.eval(parser.read(new stream.Stream(ta.value)), lisp.globalEnv);
 
                 prompt.insertAdjacentHTML("beforebegin",
@@ -28,9 +28,9 @@
                 //console.log(print.write(result));
 
                 ta.value = "";
-            } catch (err) {
-                console.error(err);
-            }
+//            } catch (err) {
+//                console.error(err);
+//            }
         }
     });
 

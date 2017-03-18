@@ -112,6 +112,8 @@
             // fn
             if (isTaggedList(exp, fnSymbol)) {
                 arg1 = car(cdr(exp));
+
+                console.log(env);
                 return new Fn(arg1, cdr(cdr(exp)), env);
             }
 
@@ -139,7 +141,8 @@
                 }
 
                 if (proc instanceof Fn) {
-                    env = env.extend(proc.params, args, proc.env);
+                    console.log(proc.env);
+                    env = proc.env.extend(proc.params, args);
                     exp = cons(doSymbol, proc.body);
 
                     continue;

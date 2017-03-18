@@ -23,6 +23,8 @@
             vars = cdr(vars);
             vals = cdr(vals);
         }
+
+        return env;
     };
 
     window.Env.prototype.lookup = function (sym) {
@@ -31,14 +33,14 @@
         env = this;
 
         while (env !== null) {
-            if (this.values[sym.value]) {
-                return this.values[sym.value];
+            if (env.values[sym.value]) {
+                return env.values[sym.value];
             }
 
             env = env.parent;
         }
 
-        throw("unbound variable");
+        throw("unbound variable '" + sym.value + "'");
     };
 
     window.Env.prototype.set = function (sym, value) {
@@ -47,8 +49,8 @@
         env = this;
 
         while (env !== null) {
-            if (this.values[sym.value]) {
-                this.values[sym.value] = value;
+            if (env.values[sym.value]) {
+                env.values[sym.value] = value;
 
                 return;
             }
@@ -56,6 +58,6 @@
             env = env.parent;
         }
 
-        throw("unbound variable");
+        throw("unbound variable '" + sym.value + "'");
     };
 })();
