@@ -1,4 +1,4 @@
-/* globals car, cdr, Fn, Pair, Symbol */
+/* globals car, cdr, stream, Fn, Pair, Symbol */
 
 (function (exports) {
     "use strict";
@@ -59,6 +59,8 @@
 
             if (obj === true || obj === null) {
                 cls = "bool";
+            } else if (obj instanceof stream.Stream) {
+                cls = "paren";
             } else if (obj instanceof Symbol) {
                 cls = "sym";
             } else if (t === "function") {
@@ -94,6 +96,10 @@
 
         if (obj instanceof Fn) {
             return "#&lt;procedure&gt;";
+        }
+
+        if (obj instanceof stream.Stream) {
+            return "#&lt;stream&gt;";
         }
 
         if (obj instanceof Symbol) {

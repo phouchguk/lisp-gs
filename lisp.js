@@ -1,4 +1,4 @@
-/* globals car, cdr, cons, makeSymbol, Env, Fn, Pair, Symbol */
+/* globals car, cdr, cons, makeSymbol, parser, stream, Env, Fn, Pair, Symbol */
 
 (function (exports) {
     "use strict";
@@ -40,6 +40,28 @@
 
         exports.globalEnv.values["null-environment"] = function () {
             return new Env(null);
+        };
+
+        exports.globalEnv.values.read = function (args) {
+            return parser.read(car(args));
+        };
+
+        exports.globalEnv.values["back-char"] = function (args) {
+            car(args).back();
+
+            return okSymbol;
+        };
+
+        exports.globalEnv.values["peek-char"] = function (args) {
+            return car(args).peek();
+        };
+
+        exports.globalEnv.values["read-char"] = function (args) {
+            return car(args).next();
+        };
+
+        exports.globalEnv.values["string->stream"] = function (args) {
+            return new stream.Stream(car(args));
         };
     };
 
