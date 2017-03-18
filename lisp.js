@@ -3,8 +3,9 @@
 (function (exports) {
     "use strict";
 
-    var defSymbol, doSymbol, fnSymbol, ifSymbol, init, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, quoteSymbol, setSymbol;
+    var applySymbol, defSymbol, doSymbol, fnSymbol, ifSymbol, init, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, prepareApplyOperands, procApply, quoteSymbol, setSymbol;
 
+    applySymbol = makeSymbol("apply");
     defSymbol = makeSymbol("def");
     doSymbol = makeSymbol("do");
     fnSymbol = makeSymbol("fn");
@@ -26,6 +27,8 @@
 
             return result;
         };
+
+        exports.globalEnv.values.apply = procApply;
     };
 
     isSelfEvaluating = function (exp) {
@@ -54,6 +57,18 @@
                     listOfValues(cdr(exps), env));
     };
 
+    prepareApplyOperands = function (args) {
+        if (cdr(args) === null) {
+            return car(args);
+        }
+
+        return cons(car(args), prepareApplyOperands(cdr(args)));
+    };
+
+    procApply = function () {
+        throw("illegal state. The body of the apply primitive procedure should not execute.");
+    };
+
     exports.eval = function (exp, env) {
         var arg1, arg2, arg3, args, proc;
 
@@ -75,8 +90,8 @@
             // set
             if (isTaggedList(exp, setSymbol)) {
                 arg1 = car(cdr(exp));
-                arg2 = car(cdr(cdr(exp)))
-;
+                arg2 = car(cdr(cdr(exp)));
+
                 env.set(arg1, exports.eval(arg2, env));
 
                 return okSymbol;
@@ -113,7 +128,6 @@
             if (isTaggedList(exp, fnSymbol)) {
                 arg1 = car(cdr(exp));
 
-                console.log(env);
                 return new Fn(arg1, cdr(cdr(exp)), env);
             }
 
@@ -137,11 +151,15 @@
                 args = listOfValues(cdr(exp), env);
 
                 if (typeof(proc) === "function") {
+                    if (proc === procApply) {
+                        proc = car(args);
+                        args = prepareApplyOperands(cdr(args));
+                    }
+
                     return proc(args);
                 }
 
                 if (proc instanceof Fn) {
-                    console.log(proc.env);
                     env = proc.env.extend(proc.params, args);
                     exp = cons(doSymbol, proc.body);
 
