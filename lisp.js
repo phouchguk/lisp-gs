@@ -3,9 +3,8 @@
 (function (exports) {
     "use strict";
 
-    var applySymbol, defSymbol, doSymbol, fnSymbol, ifSymbol, init, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, prepareApplyOperands, procApply, quoteSymbol, setSymbol;
+    var defSymbol, doSymbol, fnSymbol, ifSymbol, init, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, procApply, procEval, quoteSymbol, setSymbol;
 
-    applySymbol = makeSymbol("apply");
     defSymbol = makeSymbol("def");
     doSymbol = makeSymbol("do");
     fnSymbol = makeSymbol("fn");
@@ -29,6 +28,19 @@
         };
 
         exports.globalEnv.values.apply = procApply;
+        exports.globalEnv.values.eval = procEval;
+
+        exports.globalEnv.values.environment = function () {
+            return new Env(exports.globalEnv);
+        };
+
+        exports.globalEnv.values["interaction-environment"] = function () {
+            return exports.globalEnv;
+        };
+
+        exports.globalEnv.values["null-environment"] = function () {
+            return new Env(null);
+        };
     };
 
     isSelfEvaluating = function (exp) {
@@ -57,16 +69,12 @@
                     listOfValues(cdr(exps), env));
     };
 
-    prepareApplyOperands = function (args) {
-        if (cdr(args) === null) {
-            return car(args);
-        }
-
-        return cons(car(args), prepareApplyOperands(cdr(args)));
-    };
-
     procApply = function () {
         throw("illegal state. The body of the apply primitive procedure should not execute.");
+    };
+
+    procEval = function () {
+        throw("illegal state. The body of the eval primitive procedure should not execute.");
     };
 
     exports.eval = function (exp, env) {
@@ -153,7 +161,14 @@
                 if (typeof(proc) === "function") {
                     if (proc === procApply) {
                         proc = car(args);
-                        args = prepareApplyOperands(cdr(args));
+                        args = car(cdr(args));
+                    }
+
+                    if (proc === procEval) {
+                        exp = car(args);
+                        env = car(cdr(args));
+
+                        continue;
                     }
 
                     return proc(args);
