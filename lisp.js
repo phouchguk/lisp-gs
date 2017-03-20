@@ -162,7 +162,7 @@
             if (isTaggedList(exp, fnSymbol)) {
                 arg1 = car(cdr(exp));
 
-                return new Fn(arg1, cdr(cdr(exp)), env);
+                return new Fn(arg1, car(cdr(cdr(exp))), env);
             }
 
             // do
@@ -202,7 +202,12 @@
 
                 if (proc instanceof Fn) {
                     env = proc.env.extend(proc.params, args);
-                    exp = cons(doSymbol, proc.body);
+
+                    if (proc.body instanceof Pair) {
+                        exp = cons(doSymbol, cons(proc.body, null));
+                    } else {
+                        exp = proc.body;
+                    }
 
                     continue;
                 }
