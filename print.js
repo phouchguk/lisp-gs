@@ -60,16 +60,19 @@
             if (obj === true || obj === null) {
                 cls = "bool";
             } else if (obj instanceof stream.Stream) {
+                text = "#&lt;stream&gt;";
                 cls = "paren";
             } else if (obj instanceof Symbol) {
                 cls = "sym";
             } else if (t === "function") {
+                text = "#&lt;procedure&gt;";
                 cls = "paren";
             } else if (t === "number") {
                 cls = "nr";
             } else if (t === "string") {
                 cls = "str";
             } else if (obj instanceof Fn) {
+                text = "#&lt;procedure&gt;";
                 cls = "paren";
             } else {
                 throw("cannot html unknown type");
@@ -95,11 +98,11 @@
         }
 
         if (obj instanceof Fn) {
-            return "#&lt;procedure&gt;";
+            return "#<procedure>";
         }
 
         if (obj instanceof stream.Stream) {
-            return "#&lt;stream&gt;";
+            return "#<stream>";
         }
 
         if (obj instanceof Symbol) {
@@ -109,7 +112,7 @@
         t = typeof(obj);
 
         if (t === "function") {
-            return "#&lt;procedure&gt;";
+            return "#<procedure>";
         }
 
         if (t === "number") {
