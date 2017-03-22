@@ -3,7 +3,7 @@
 (function (exports) {
     "use strict";
 
-    var defSymbol, doSymbol, fnSymbol, ifSymbol, init, isSelfEvaluating, isTaggedList, listOfValues, okSymbol, procApply, procEval, quoteSymbol, setSymbol;
+    var defSymbol, doSymbol, fnSymbol, globalEnv, globalEval, ifSymbol, init, isSelfEvaluating, isTaggedList, lispEval, listOfValues, okSymbol, procApply, procEval, quoteSymbol, setSymbol;
 
     defSymbol = makeSymbol("def");
     doSymbol = makeSymbol("do");
@@ -14,7 +14,7 @@
     setSymbol = makeSymbol("set!");
 
     init = function () {
-        exports.globalEnv.values["+"] = function (args) {
+        globalEnv.values["+"] = function (args) {
             var result;
 
             result = 0;
@@ -27,45 +27,47 @@
             return result;
         };
 
-        exports.globalEnv.values.apply = procApply;
-        exports.globalEnv.values.eval = procEval;
+        globalEnv.values.apply = procApply;
+        globalEnv.values.eval = procEval;
 
-        exports.globalEnv.values.environment = function () {
-            return new Env(exports.globalEnv);
+        globalEnv.values.environment = function () {
+            return new Env(globalEnv);
         };
 
-        exports.globalEnv.values["interaction-environment"] = function () {
-            return exports.globalEnv;
+        globalEnv.values["current-env"] = function () {
+            return globalEnv;
         };
 
-        exports.globalEnv.values["null-environment"] = function () {
-            return new Env(null);
-        };
-
-        exports.globalEnv.values.read = function (args) {
+        globalEnv.values.read = function (args) {
             return parser.read(car(args));
         };
 
-        exports.globalEnv.values["back-char"] = function (args) {
+        globalEnv.values["set-eval!"] = function (args) {
+            globalEval = car(args);
+
+            return okSymbol;
+        };
+
+        globalEnv.values.error = function (args) {
+            throw(car(args));
+        };
+
+        globalEnv.values["back-char"] = function (args) {
             car(args).back();
 
             return okSymbol;
         };
 
-        exports.globalEnv.values["peek-char"] = function (args) {
+        globalEnv.values["peek-char"] = function (args) {
             return car(args).peek();
         };
 
-        exports.globalEnv.values["read-char"] = function (args) {
+        globalEnv.values["read-char"] = function (args) {
             return car(args).next();
         };
 
-        exports.globalEnv.values["string->stream"] = function (args) {
+        globalEnv.values["string->stream"] = function (args) {
             return new stream.Stream(car(args));
-        };
-
-        exports.globalEnv.values.error = function (args) {
-            throw(car(args));
         };
     };
 
@@ -85,25 +87,7 @@
         return false;
     };
 
-
-    listOfValues = function (exps, env) {
-        if (exps === null) {
-            return null;
-        }
-
-        return cons(exports.eval(car(exps), env),
-                    listOfValues(cdr(exps), env));
-    };
-
-    procApply = function () {
-        throw("illegal state. The body of the apply primitive procedure should not execute.");
-    };
-
-    procEval = function () {
-        throw("illegal state. The body of the eval primitive procedure should not execute.");
-    };
-
-    exports.eval = function (exp, env) {
+    lispEval = function (exp, env) {
         var arg1, arg2, arg3, args, proc;
 
         while (true) {
@@ -126,7 +110,7 @@
                 arg1 = car(cdr(exp));
                 arg2 = car(cdr(cdr(exp)));
 
-                env.set(arg1, exports.eval(arg2, env));
+                env.set(arg1, lispEval(arg2, env));
 
                 return okSymbol;
             }
@@ -136,7 +120,7 @@
                 arg1 = car(cdr(exp));
                 arg2 = car(cdr(cdr(exp)));
 
-                env.def(arg1, exports.eval(arg2, env));
+                env.def(arg1, lispEval(arg2, env));
 
                 return okSymbol;
             }
@@ -147,12 +131,12 @@
                 arg2 = car(cdr(cdr(exp)));
                 arg3 = car(cdr(cdr(cdr(exp))));
 
-                if (exports.eval(arg1, env) === null) {
+                if (lispEval(arg1, env) === null) {
                     // false
-                    exp = exports.eval(arg3, env);
+                    exp = lispEval(arg3, env);
                 } else {
                     // true
-                    exp = exports.eval(arg2, env);
+                    exp = lispEval(arg2, env);
                 }
 
                 continue;
@@ -170,7 +154,7 @@
                 exp = cdr(exp);
 
                 while (cdr(exp) !== null) {
-                    exports.eval(car(exp), env);
+                    lispEval(car(exp), env);
                     exp = cdr(exp);
                 }
 
@@ -181,7 +165,7 @@
 
             // application
             if (exp instanceof Pair) {
-                proc = exports.eval(car(exp), env);
+                proc = lispEval(car(exp), env);
                 args = listOfValues(cdr(exp), env);
 
                 if (typeof(proc) === "function") {
@@ -214,6 +198,39 @@
         }
     };
 
-    exports.globalEnv = new Env(null);
+    listOfValues = function (exps, env) {
+        if (exps === null) {
+            return null;
+        }
+
+        return cons(lispEval(car(exps), env),
+                    listOfValues(cdr(exps), env));
+    };
+
+    procApply = function () {
+        throw("illegal state. The body of the apply primitive procedure should not execute.");
+    };
+
+    procEval = function () {
+        throw("illegal state. The body of the eval primitive procedure should not execute.");
+    };
+
+    exports.readEval = function (str) {
+        var exp;
+
+        if (globalEval === lispEval) {
+            exp = parser.read(new stream.Stream(str));
+        } else if (globalEval instanceof Symbol) {
+            exp = cons(globalEval, cons(str, null));
+        } else {
+            throw("global eval must be a symbol");
+        }
+
+        return lispEval(exp, globalEnv);
+    };
+
+    globalEnv = new Env(null);
+    globalEval = lispEval;
+
     init();
 }(window.lisp = window.lisp || {}));

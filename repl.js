@@ -1,4 +1,4 @@
-/* globals console, lisp, parser, print, stream */
+/* globals lisp, print */
 
 (function () {
     "use strict";
@@ -16,7 +16,7 @@
 
             // if the user pressed enter, try and read
 //            try {
-                result = lisp.eval(parser.read(new stream.Stream(ta.value)), lisp.globalEnv);
+                result = lisp.readEval(ta.value);
 
                 prompt.insertAdjacentHTML("beforebegin",
                                           "<span>&gt;&nbsp;" +
