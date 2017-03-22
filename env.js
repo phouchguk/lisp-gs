@@ -1,7 +1,11 @@
-/* globals car, cdr */
+/* globals car, cdr, makeSymbol */
 
 (function () {
     "use strict";
+
+    var us;
+
+    us = makeSymbol("_");
 
     window.Env = function (parent) {
         this.values = {};
@@ -9,7 +13,9 @@
     };
 
     window.Env.prototype.def = function (sym, value) {
-        this.values[sym.value] = value;
+        if (sym !== us) {
+            this.values[sym.value] = value;
+        }
     };
 
     window.Env.prototype.extend = function (vars, vals) {
@@ -18,6 +24,7 @@
         env = new window.Env(this);
 
         while (vars !== null) {
+
             env.def(car(vars), car(vals));
 
             vars = cdr(vars);
