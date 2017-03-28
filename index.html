@@ -12,20 +12,20 @@
     <script src="fn.js"></script>
     <script src="print.js"></script>
     <script src="lisp.js"></script>
-    <script id="core" type="x-lisp">
+    <script id="core1" type="x-lisp">
 (do
   (def core-eval
     (fn (exp)
-      (log! "in core eval")
-      (log! (display exp))
+      ;(log! "in core eval")
+      ;(log! (display exp))
       (eval exp
             (current-env))))
 
-  ;(set-eval! (quote core-eval))
+  (set-eval! (quote core-eval))
 
-  (def dict-add
-    (fn (dict key value)
-      (cons (cons key value) dict)))
+  (def al-add
+    (fn (al key value)
+      (cons (cons key value) al)))
 
   (def caar
     (fn (x)
@@ -35,15 +35,38 @@
     (fn (x)
       (car (cdr x))))
 
-  (def dict-find
-    (fn (dict key)
+  (def al-find
+    (fn (al key)
       (if dict
-          (if (= (caar dict) key)
-              (cdar dict)
-              (dict-find (cdr dict) key))
+          (if (= (caar al) key)
+              (cdar al)
+              (al-find (cdr al) key))
           nil)))
 
-  ;(read-macros! (quote (("'" )  (read-macros))))
+  (def tag-with
+    (fn (sym)
+      (fn (s) (cons sym (cons (read s) nil)))))
+
+  (read-macros!
+    (al-add (read-macros)
+            "'"
+            (tag-with (quote quote)))))
+    </script>
+    <script id="core2" type="x-lisp">
+(do
+  (read-macros!
+    (al-add (read-macros)
+            "`"
+            (tag-with 'quasiquote)))
+
+  (read-macros!
+    (al-add (read-macros)
+            ","
+            (fn (s)
+              ((tag-with (if (= (peek-char s) "@")
+                             (do (read-char s) 'unquote-splicing)
+                             'unquote))
+                         s))))
 
   (def answer 42))
     </script>

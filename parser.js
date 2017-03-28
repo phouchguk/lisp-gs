@@ -93,15 +93,6 @@
 
         c = s.next();
 
-        mac = exports.readMacros;
-        while (mac !== null) {
-            if (c === car(car(mac))) {
-                lisp.eval(cdr(car(mac)));
-            }
-
-            mac = cdr(mac);
-        }
-
         // TRUE
         if (c === "#") {
             c = s.next();
@@ -158,6 +149,16 @@
         // PAIR
         if (c === "(") {
             return readPair(s);
+        }
+
+        // READER MACRO
+        mac = exports.readMacros;
+        while (mac !== null) {
+            if (c === car(car(mac))) {
+                return lisp.eval(cons(cdr(car(mac)), cons(s, null)), lisp.globalEnv);
+            }
+
+            mac = cdr(mac);
         }
 
         // SYMBOL

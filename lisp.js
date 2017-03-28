@@ -126,7 +126,9 @@
 
     isSelfEvaluating = function (exp) {
         return exp === true || exp === null ||
-            typeof(exp) === "number" || typeof(exp) === "string";
+            typeof(exp) === "number" || typeof(exp) === "string" ||
+            typeof(exp) === "function" ||
+            exp instanceof Fn || exp instanceof stream.Stream;
     };
 
     isTaggedList = function (exp, tag) {
@@ -247,6 +249,8 @@
                 throw("unknown procedure type");
             }
 
+            console.log(print.write(exp));
+
             throw("cannot eval unknown expression type");
         }
     };
@@ -271,7 +275,7 @@
     exports.eval = function (exp) {
         if (globalEval instanceof Symbol) {
             exp = cons(globalEval, cons(cons(quoteSymbol, cons(exp, null)), null));
-            console.log(print.write(exp));
+            //console.log(print.write(exp));
         } else if (globalEval !== lispEval) {
             throw("global eval must be a symbol");
         }
