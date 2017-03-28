@@ -1,4 +1,4 @@
-/* globals cons, makeSymbol */
+/* globals car, cdr, cons, makeSymbol */
 
 (function (exports) {
     "use strict";

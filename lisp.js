@@ -1,4 +1,4 @@
-/* globals car, cdr, cons, makeSymbol, parser, stream, Env, Fn, Pair, Symbol */
+/* globals car, cdr, cons, console, makeSymbol, parser, stream, Env, Fn, Pair, Symbol */
 
 (function (exports) {
     "use strict";
@@ -76,7 +76,7 @@
             return new stream.Stream(car(args));
         };
 
-        globalEnv.values["read-macros"] = function (args) {
+        globalEnv.values["read-macros"] = function () {
             return parser.readMacros;
         };
 
@@ -84,6 +84,10 @@
             parser.readMacros = car(args);
 
             return okSymbol;
+        };
+
+        globalEnv.values.display = function (args) {
+            return print.write(car(args));
         };
     };
 
@@ -231,18 +235,19 @@
         throw("illegal state. The body of the eval primitive procedure should not execute.");
     };
 
-    exports.readEval = function (str) {
-        var exp;
-
-        if (globalEval === lispEval) {
-            exp = parser.read(new stream.Stream(str));
-        } else if (globalEval instanceof Symbol) {
-            exp = cons(globalEval, cons(str, null));
-        } else {
+    exports.eval = function (exp) {
+        if (globalEval instanceof Symbol) {
+            exp = cons(globalEval, cons(cons(quoteSymbol, cons(exp, null)), null));
+            console.log(print.write(exp));
+        } else if (globalEval !== lispEval) {
             throw("global eval must be a symbol");
         }
 
         return lispEval(exp, globalEnv);
+    };
+
+    exports.readEval = function (str) {
+        return exports.eval(parser.read(new stream.Stream(str)));
     };
 
     globalEnv = new Env(null);

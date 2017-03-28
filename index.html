@@ -15,8 +15,10 @@
     <script id="core" type="x-lisp">
 (do
   (def core-eval
-    (fn (s)
-      (eval (read (string->stream s))
+    (fn (exp)
+      (log! "in core eval")
+      (log! (display exp))
+      (eval exp
             (current-env))))
 
   (set-eval! (quote core-eval))
