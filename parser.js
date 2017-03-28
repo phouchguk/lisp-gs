@@ -1,4 +1,4 @@
-/* globals car, cdr, cons, makeSymbol */
+/* globals car, cdr, cons, lisp, makeSymbol */
 
 (function (exports) {
     "use strict";
@@ -96,7 +96,7 @@
         mac = exports.readMacros;
         while (mac !== null) {
             if (c === car(car(mac))) {
-
+                lisp.eval(cdr(car(mac)));
             }
 
             mac = cdr(mac);

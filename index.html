@@ -21,7 +21,29 @@
       (eval exp
             (current-env))))
 
-  (set-eval! (quote core-eval))
+  ;(set-eval! (quote core-eval))
+
+  (def dict-add
+    (fn (dict key value)
+      (cons (cons key value) dict)))
+
+  (def caar
+    (fn (x)
+      (car (car x))))
+
+  (def cdar
+    (fn (x)
+      (car (cdr x))))
+
+  (def dict-find
+    (fn (dict key)
+      (if dict
+          (if (= (caar dict) key)
+              (cdar dict)
+              (dict-find (cdr dict) key))
+          nil)))
+
+  ;(read-macros! (quote (("'" )  (read-macros))))
 
   (def answer 42))
     </script>

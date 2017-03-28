@@ -40,7 +40,7 @@
         env = this;
 
         while (env !== null) {
-            if (env.values[sym.value]) {
+            if (typeof env.values[sym.value] !== "undefined") {
                 return env.values[sym.value];
             }
 

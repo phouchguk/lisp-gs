@@ -27,6 +27,35 @@
             return result;
         };
 
+        globalEnv.values["="] = function (args) {
+            var first;
+
+            if (args === null) {
+                return true;
+            }
+
+            first = car(args);
+            args = cdr(args);
+
+            while (args !== null) {
+                if (first !== car(args)) {
+                    return null;
+                }
+
+                args = cdr(args);
+            }
+
+            return true;
+        };
+
+        globalEnv.values.car = function (args) {
+            return car(car(args));
+        };
+
+        globalEnv.values.cdr = function (args) {
+            return cdr(car(args));
+        };
+
         globalEnv.values.apply = procApply;
         globalEnv.values.eval = procEval;
 
@@ -84,6 +113,10 @@
             parser.readMacros = car(args);
 
             return okSymbol;
+        };
+
+        globalEnv.values.cons = function (args) {
+            return new Pair(car(args), car(cdr(args)));
         };
 
         globalEnv.values.display = function (args) {
@@ -153,10 +186,10 @@
 
                 if (lispEval(arg1, env) === null) {
                     // false
-                    exp = lispEval(arg3, env);
+                    exp = arg3;//lispEval(arg3, env);
                 } else {
                     // true
-                    exp = lispEval(arg2, env);
+                    exp = arg2;//lispEval(arg2, env);
                 }
 
                 continue;
@@ -219,12 +252,12 @@
     };
 
     listOfValues = function (exps, env) {
-        if (exps === null) {
-            return null;
+        if (exps instanceof Pair) {
+            return cons(lispEval(car(exps), env),
+                        listOfValues(cdr(exps), env));
         }
 
-        return cons(lispEval(car(exps), env),
-                    listOfValues(cdr(exps), env));
+        return lispEval(exps, env);
     };
 
     procApply = function () {
