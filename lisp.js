@@ -58,6 +58,12 @@
             return okSymbol;
         };
 
+        globalEnv.values["log!"] = function (args) {
+            console.log(car(args));
+
+            return okSymbol;
+        };
+
         globalEnv.values["peek-char"] = function (args) {
             return car(args).peek();
         };
@@ -68,6 +74,16 @@
 
         globalEnv.values["string->stream"] = function (args) {
             return new stream.Stream(car(args));
+        };
+
+        globalEnv.values["read-macros"] = function (args) {
+            return parser.readMacros;
+        };
+
+        globalEnv.values["read-macros!"] = function (args) {
+            parser.readMacros = car(args);
+
+            return okSymbol;
         };
     };
 

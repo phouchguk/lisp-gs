@@ -84,12 +84,23 @@
         return cons(carObj, cdrObj);
     };
 
+    exports.readMacros = null;
+
     exports.read = function (s) {
-        var c, nr, token;
+        var c, mac, nr, token;
 
         eatWhitespace(s);
 
         c = s.next();
+
+        mac = exports.readMacros;
+        while (mac !== null) {
+            if (c === car(car(mac))) {
+
+            }
+
+            mac = cdr(mac);
+        }
 
         // TRUE
         if (c === "#") {

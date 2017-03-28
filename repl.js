@@ -34,5 +34,7 @@
         }
     });
 
+    lisp.readEval(document.getElementById("core").innerText);
+
     ta.focus();
 })();

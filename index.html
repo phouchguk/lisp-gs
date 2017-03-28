@@ -12,6 +12,17 @@
     <script src="fn.js"></script>
     <script src="print.js"></script>
     <script src="lisp.js"></script>
+    <script id="core" type="x-lisp">
+(do
+  (def core-eval
+    (fn (s)
+      (eval (read (string->stream s))
+            (current-env))))
+
+  (set-eval! (quote core-eval))
+
+  (def answer 42))
+    </script>
   </head>
   <body>
     <div id="repl">
