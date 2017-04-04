@@ -169,7 +169,9 @@
             c = s.next();
         }
 
-        s.back();
+        if (c !== null) {
+            s.back();
+        }
 
         if (token === "nil") {
             return null;

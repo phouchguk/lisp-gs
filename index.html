@@ -12,63 +12,61 @@
     <script src="fn.js"></script>
     <script src="print.js"></script>
     <script src="lisp.js"></script>
-    <script id="core1" type="x-lisp">
-(do
-  (def core-eval
-    (fn (exp)
-      ;(log! "in core eval")
-      ;(log! (display exp))
-      (eval exp
-            (current-env))))
+    <script id="core" type="x-lisp">
+(def core-eval
+  (fn (exp)
+    ;(log! "in core eval")
+    ;(log! (display exp))
+    (eval exp
+          (current-env))))
 
-  (set-eval! (quote core-eval))
+(set-eval! (quote core-eval))
 
-  (def al-add
-    (fn (al key value)
-      (cons (cons key value) al)))
+(def al-add
+  (fn (al key value)
+    (cons (cons key value) al)))
 
-  (def caar
-    (fn (x)
-      (car (car x))))
+(def caar
+  (fn (x)
+    (car (car x))))
 
-  (def cdar
-    (fn (x)
-      (car (cdr x))))
+(def cdar
+  (fn (x)
+    (car (cdr x))))
 
-  (def al-find
-    (fn (al key)
-      (if dict
-          (if (= (caar al) key)
-              (cdar al)
-              (al-find (cdr al) key))
-          nil)))
+(def al-find
+  (fn (al key)
+    (if dict
+        (if (= (caar al) key)
+            (cdar al)
+            (al-find (cdr al) key))
+        nil)))
 
-  (def tag-with
-    (fn (sym)
-      (fn (s) (cons sym (cons (read s) nil)))))
+(def tag-with
+  (fn (sym)
+    (fn (s) (cons sym (cons (read s) nil)))))
 
-  (read-macros!
-    (al-add (read-macros)
-            "'"
-            (tag-with (quote quote)))))
-    </script>
-    <script id="core2" type="x-lisp">
-(do
-  (read-macros!
-    (al-add (read-macros)
-            "`"
-            (tag-with 'quasiquote)))
+(read-macros!
+  (al-add (read-macros)
+          "'"
+          (tag-with (quote quote))))
 
-  (read-macros!
-    (al-add (read-macros)
-            ","
-            (fn (s)
-              ((tag-with (if (= (peek-char s) "@")
-                             (do (read-char s) 'unquote-splicing)
-                             'unquote))
-                         s))))
+(read-macros!
+  (al-add (read-macros)
+          "`"
+          ; can now use ' we just defined
+          (tag-with 'quasiquote)))
 
-  (def answer 42))
+(read-macros!
+  (al-add (read-macros)
+          ","
+          (fn (s)
+            ((tag-with (if (= (peek-char s) "@")
+                           (do (read-char s) 'unquote-splicing)
+                           'unquote))
+                       s))))
+
+(def answer 42)
     </script>
   </head>
   <body>

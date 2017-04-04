@@ -34,8 +34,7 @@
         }
     });
 
-    lisp.readEval(document.getElementById("core1").innerText);
-    lisp.readEval(document.getElementById("core2").innerText);
+    lisp.readEval(document.getElementById("core").innerText);
 
     ta.focus();
 })();

@@ -284,7 +284,15 @@
     };
 
     exports.readEval = function (str) {
-        return exports.eval(parser.read(new stream.Stream(str)));
+        var res, s;
+
+        s = new stream.Stream(str.trim());
+
+        while (s.peek() !== null) {
+            res = exports.eval(parser.read(s));
+        }
+
+        return res;
     };
 
     globalEnv = new Env(null);
