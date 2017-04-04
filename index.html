@@ -44,7 +44,8 @@
 
 (def tag-with
   (fn (sym)
-    (fn (s) (cons sym (cons (read s) nil)))))
+    (fn (s)
+      (cons sym (cons (read s) nil)))))
 
 (read-macros!
   (al-add (read-macros)
@@ -67,6 +68,20 @@
                        s))))
 
 (def answer 42)
+
+(def atom?
+  (fn (x)
+    (not (pair? x)))
+
+(def expand-quasiquote
+  (fn (exp)
+    (if (atom? exp)
+        (quote exp)
+        (if (= (car exp) 'unquote)
+            (cdr exp)
+            (if (and (pair? (car exp)) (= (caar exp) 'unquote-splicing))
+                (append (cadr exp) (expand-quasiquote (cdr exp)))
+                (cons (expand-quasiquote (car exp)) (expand-quasiquote (cdr exp))))))))
     </script>
   </head>
   <body>
