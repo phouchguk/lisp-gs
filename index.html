@@ -13,11 +13,22 @@
     <script src="print.js"></script>
     <script src="lisp.js"></script>
     <script id="core" type="x-lisp">
+(def not
+  (fn (x) (if x nil #t)))
+
+(def atom?
+  (fn (x)
+    (not (pair? x)))
+
+(def expand
+  (fn (exp)
+    exp))
+
 (def core-eval
   (fn (exp)
     ;(log! "in core eval")
     ;(log! (display exp))
-    (eval exp
+    (eval (expand exp)
           (current-env))))
 
 (set-eval! (quote core-eval))
@@ -68,10 +79,6 @@
                        s))))
 
 (def answer 42)
-
-(def atom?
-  (fn (x)
-    (not (pair? x)))
 
 (def expand-quasiquote
   (fn (exp)

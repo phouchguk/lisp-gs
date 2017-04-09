@@ -3,9 +3,8 @@
 (function (exports) {
     "use strict";
 
-    var andSymbol, defSymbol, doSymbol, fnSymbol, globalEnv, globalEval, ifSymbol, init, isSelfEvaluating, isTaggedList, lispEval, listOfValues, okSymbol, procApply, procEval, quoteSymbol, setSymbol;
+    var defSymbol, doSymbol, fnSymbol, globalEnv, globalEval, ifSymbol, init, isSelfEvaluating, isTaggedList, lispEval, listOfValues, okSymbol, procApply, procEval, quoteSymbol, setSymbol;
 
-    andSymbol = makeSymbol("and");
     defSymbol = makeSymbol("def");
     doSymbol = makeSymbol("do");
     fnSymbol = makeSymbol("fn");
@@ -22,6 +21,19 @@
 
             while (args !== null) {
                 result = result + car(args);
+                args = cdr(args);
+            }
+
+            return result;
+        };
+
+        globalEnv.values["*"] = function (args) {
+            var result;
+
+            result = 1;
+
+            while (args !== null) {
+                result = result * car(args);
                 args = cdr(args);
             }
 
@@ -59,10 +71,6 @@
 
         globalEnv.values["pair?"] = function (args) {
             return car(args) instanceof Pair || null;
-        };
-
-        globalEnv.values.not = function (args) {
-            return car(args) === null ? true : null;
         };
 
         globalEnv.values.apply = procApply;
@@ -152,7 +160,7 @@
     };
 
     lispEval = function (exp, env) {
-        var arg1, arg2, arg3, args, proc, res;
+        var arg1, arg2, arg3, args, proc;
 
         while (true) {
             if (isSelfEvaluating(exp)) {
@@ -219,29 +227,6 @@
 
                 while (cdr(exp) !== null) {
                     lispEval(car(exp), env);
-                    exp = cdr(exp);
-                }
-
-                exp = car(exp);
-
-                continue;
-            }
-
-            // and
-            if (isTaggedList(exp, andSymbol)) {
-                exp = cdr(exp);
-
-                if (exp === null) {
-                    return true;
-                }
-
-                while (cdr(exp) !== null) {
-                    res = lispEval(car(exp), env);
-
-                    if (res === null) {
-                        return res;
-                    }
-
                     exp = cdr(exp);
                 }
 
